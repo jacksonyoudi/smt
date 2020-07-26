@@ -3,22 +3,29 @@ import csv
 
 if __name__ == '__main__':
     sg.theme('Dark Brown 1')
+    headings = None
+    input_rows = []
+    with open('gdp.csv') as f:
+        f_csv = csv.DictReader(f)
+        for row in f_csv:
+            headings = list(row.keys())
+
+            r = [sg.Input(
+                size=(15, 2),
+                pad=(1, 1),
+                default_text=col,
+                disabled=True,
+                text_color='black'
+            ) for col in list(row.values())]
+            r.append(sg.Input(
 
 
 
+            ))
 
-    headings = ['HEADER 1', 'HEADER 2', 'HEADER 3', 'HEADER 4']
+            input_rows.append(r)
+
     header = [[sg.Text('  ')] + [sg.Text(h, size=(14, 1)) for h in headings]]
-
-    input_rows = [[sg.Input(
-        size=(15, 2),
-        pad=(1, 1),
-        default_text="hello",
-        disabled=True,
-        text_color='black'
-
-    ) for col in range(4)] for row
-        in range(10)]
 
     layout = header + input_rows
 
