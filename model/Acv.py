@@ -55,3 +55,28 @@ create table if not exists detail_tab (
     ts TIMESTAMP default CURRENT_TIMESTAMP
     )
 """
+
+ct_tab = """
+create table if not exists detail_tab (
+    id INTEGER PRIMARY KEY  AUTOINCREMENT ,
+    typ INTEGER(5),
+    c1 varchar(50),
+    c2 varchar(50),
+    c3 varchar(50),
+    c4 varchar(50),
+    c5 varchar(50),
+    c6 varchar(50),
+    c7 varchar(50),
+    c8 varchar(50),
+    c9 varchar(50),
+    c10 varchar(50),
+    c11 varchar(50),
+    c12 varchar(50),
+    c13 varchar(50),
+    c14 varchar(50),
+    c15 varchar(50),
+    c16 varchar(50),
+    c17 varchar(50),
+    ts TIMESTAMP default CURRENT_TIMESTAMP
+    )
+"""
