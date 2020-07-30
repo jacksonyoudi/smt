@@ -34,12 +34,12 @@ def parse_csv(csv_file):
         header = next(f_csv)
         for row in f_csv:
             data.append(row)
-    return data
+    return header, data
 
 
 if __name__ == '__main__':
-    f = "../1HZ9011113-05_6433997B.csv"
-    data = parse_csv(f)
-
-    one = data[0]
-    table(one)
+    f = "../../1HZ9011113-05_6433997B.csv"
+    header, data = parse_csv(f)
+    print(header)
+    # one = data[0]
+    # table(one)

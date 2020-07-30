@@ -7,3 +7,7 @@ def delete():
 
 def insert():
     pass
+
+
+def select():
+    pass
