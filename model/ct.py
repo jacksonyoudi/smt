@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import sqlite3
-
-from controller.lib.pd_excel_handle import parse_excel_by_pd
 
 ct_tab = """
 create table if not exists ct_tab (
@@ -31,8 +28,7 @@ create table if not exists ct_tab (
 """
 
 
-def insert_ct(data):
-    conn = sqlite3.connect("../../smt/first.db")
+def insert_ct(data, conn):
     cursor = conn.cursor()
     cursor.execute("drop table if exists ct_tab;")
     conn.commit()
@@ -51,9 +47,7 @@ def insert_ct(data):
 
 
 def get_ct(conn):
-    conn = sqlite3.connect("../../smt/first.db")
     cursor = conn.cursor()
-
     data = {}
 
     result = cursor.execute(
