@@ -2,6 +2,7 @@
 
 import PySimpleGUI as sg
 from controller.lib.csv_handle import parse_csv
+from controller.lib.pd_excel_handle import parse_excel_by_pd
 
 if __name__ == '__main__':
     sg.theme('Dark Blue 3')  # please make your windows colorful
@@ -12,9 +13,12 @@ if __name__ == '__main__':
                          pad=((2, 2), (2, 2))),
                 sg.Input(key='acv_file', enable_events=True, visible=False),
                 sg.FileBrowse("导入ACV数据", target='acv_file', size=(20, 2), key="import_acv_csv", enable_events=True)]
-    two_line = [sg.Text("导入报表:", size=(10, 2), auto_size_text=True), sg.Button("导入报表", size=(20, 2)),
+    two_line = [sg.Text("表格操作:", size=(10, 3)), sg.Input(key='report_file', enable_events=True, visible=False),
+                sg.FileBrowse("导入报表", target='report_file', size=(20, 2), key="import_report_table",
+                              enable_events=True),
                 sg.Button("导出报表", size=(20, 2))]
-    three_line = [sg.Text("CT设置:", size=(10, 2)), sg.Button("导入CT设置表", size=(20, 2)),
+    three_line = [sg.Text("CT设置:", size=(10, 2)), sg.Input(key='ct_file', enable_events=True, visible=False),
+                  sg.FileBrowse("导入CT设置表", target='ct_file', size=(20, 2), key="import_ct_xlsm", enable_events=True),
                   sg.Button("导出CT设置表", size=(20, 2))]
 
     # header = [[sg.Text('  ')] + [sg.Text(h, size=(14, 1)) for h in headings]]
@@ -70,6 +74,16 @@ if __name__ == '__main__':
             data.remove(row)
             window.Element('_table_').Update(data)
             sg.popup("删除成功")
+
+        if event == 'ct_file':
+            ct_file = values.get('ct_file')
+            data = parse_excel_by_pd(ct_file)
+            for i in data:
+                print(i)
+
+        if event == 'report_file':
+            report_table = values.get('import_report_table')
+            print(report_table)
 
         if event == sg.WIN_CLOSED or event == 'Cancel':
             break
