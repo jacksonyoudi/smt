@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import PySimpleGUI as sg
-from model.db import insert_ct_data, parse_acv_data
+from model.db import insert_ct_data, parse_acv_data, parse_report_data
 from model.acv import get_acv, delete_acv_by_id
 import sqlite3
 import csv
+import datetime
+import os
 
 lines = {
     "EPS 1#": 6,
@@ -38,10 +40,13 @@ if __name__ == '__main__':
                          pad=((2, 2), (2, 2))),
                 sg.Input(key='acv_file', enable_events=True, visible=False),
                 sg.FileBrowse("导入ACV数据", target='acv_file', size=(20, 2), key="import_acv_csv", enable_events=True)]
-    two_line = [sg.Text("表格操作:", size=(10, 3)), sg.Input(key='report_file', enable_events=True, visible=False),
-                sg.FileBrowse("导入报表", target='report_file', size=(20, 2), key="import_report_table",
+    two_line = [sg.Text("表格操作:", size=(10, 3)), sg.Input(key='import_report_file', enable_events=True, visible=False),
+                sg.FileBrowse("导入报表", target='import_report_file', size=(20, 2), key="import_report_table",
                               enable_events=True),
-                sg.Button("导出报表", size=(20, 2), key='export_table')]
+
+                sg.Input(key='export_report_path', enable_events=True, visible=False),
+                sg.FolderBrowse("导出报表", target='export_report_path', size=(20, 2), key='export_table',
+                                enable_events=True)]
     three_line = [sg.Text("CT设置:", size=(10, 2)), sg.Input(key='ct_file', enable_events=True, visible=False),
                   sg.FileBrowse("导入CT设置表", target='ct_file', size=(20, 2), key="import_ct_xlsm", enable_events=True),
                   sg.Button("导出CT设置表", size=(20, 2))]
@@ -49,15 +54,18 @@ if __name__ == '__main__':
     # header = [[sg.Text('  ')] + [sg.Text(h, size=(14, 1)) for h in headings]]
     # input_rows = [[sg.Input(size=(15, 1), pad=(0, 0)) for col in range(4)] for row in range(10)]
 
-    # headings = ['机种', '品番', '工单号', '面番', '批量', '开始时间', '结束时间', '标准CT(秒)', '理论时间', '实际时间', '可动率', '短暂停时间(分钟)', '短暂停回数',
-    #             '故障停时间(分钟)',
-    #             '故障备注', '换线时间', '导入时间', '操作']
+    headings = [
+        'id', '机种', '品番', '工单号', '面番', '批量',
+        '开始时间', '结束时间', '标准CT(秒)', '理论时间',
+        '实际时间', '可动率', '短暂停时间(分钟)', '短暂停回数',
+        '故障停时间(分钟)',
+        '故障备注', '换线时间', '导入时间']
 
-    headings = ['id', 'typ', 'model', 'product_number', 'wo_no', 'surface', 'cnt', 'start_time', 'end_time',
-                'ct_duration', 'theory_ts', 'actual_ts', 'movable_rate', 'stops', 'stop_ts', 'fault_note', 'change_ts',
-                'gen_line']
+    # headings = ['id', 'jizhong', 'pinfan', 'gongdanhao', 'mianfan', 'piliang', 'kaishi_shijian', 'jieshu_shijian',
+    #             'biaozhun_ct', 'lilun_shijian', 'shiji_shijian', 'kedong_lv', 'duanzanting_shijian', 'duanzanting_huishu', 'guzhangting_shijian',
+    #             'guzhang_beizhu','huanxian_shijian','daoru_shijian',
+    #             'gen_line']
     data = get_acv(conn)
-    print(data)
     if len(data) == 0:
         data = [headings]
 
@@ -65,7 +73,8 @@ if __name__ == '__main__':
               one_line,
               two_line,
               three_line,
-              [sg.Text("明细数据:", size=(10, 3), auto_size_text=True)],
+              [sg.Text("明细数据:", size=(10, 3), auto_size_text=True),
+               sg.Button("删除数据", key="delete_table_row", enable_events=True)],
               [sg.Table(values=data,
                         headings=headings,
                         enable_events=True,
@@ -102,7 +111,8 @@ if __name__ == '__main__':
             window.Element('_table_').Update(data)
             sg.popup("页面已刷新")
 
-        if event == '_table_':
+        if event == 'delete_table_row':
+            # if event == '_table_':
             select_index = values.get("_table_")[0]
             row = window.Element('_table_').Values[select_index]
             data = window.Element('_table_').Values
@@ -121,12 +131,33 @@ if __name__ == '__main__':
             report_table = values.get('import_report_table')
 
         if event == 'export_table':
-            result = get_acv(conn)
-            with open('./stocks.csv', 'w') as f:
-                f_csv = csv.writer(f)
-                f_csv.writerow(headings)
-                f_csv.writerows(result)
-            sg.popup("导出成功")
+            pass
+
+        if event == 'export_report_path':
+            export_report_path = values.get("export_report_path")
+            if export_report_path:
+                file_path = os.path.join(export_report_path,
+                                         "export_tab_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d")))
+                result = get_acv(conn)
+                with open(file_path, 'w') as f:
+                    f_csv = csv.writer(f)
+                    f_csv.writerow(headings[1:])
+                    for row in result:
+                        f_csv.writerow(row[1:])
+                sg.popup("导出成功!")
+            else:
+                sg.popup("请选择一个合法的目录!")
+
+        if event == 'import_report_file':
+            import_report_file = values.get('import_report_file')
+            if import_report_file:
+                parse_report_data(import_report_file, conn)
+                sg.popup("导入成功")
+                result = get_acv(conn)
+                window.Element('_table_').Update(result)
+                sg.popup("页面已刷新")
+            else:
+                sg.popup("请选择一个合法的文件!")
 
         if event == sg.WIN_CLOSED or event == 'Cancel':
             conn.close()

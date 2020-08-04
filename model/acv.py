@@ -21,26 +21,34 @@ lines = {
 
 }
 
+# 'id', 'jizhong', 'pinfan', 'gongdanhao', 'mianfan', 'piliang', 'kaishi_shijian', 'jieshu_shijian',
+#     #             'biaozhun_ct', 'lilun_shijian', 'shiji_shijian', 'kedong_lv', 'duanzanting_shijian', 'duanzanting_huishu', 'guzhangting_shijian',
+#     #             'guzhang_beizhu','huanxian_shijian','daoru_shijian',
+#     #             'gen_line'
+
+
 acv_tab = """
 create table if not exists acv_tab (
     id INTEGER PRIMARY KEY  AUTOINCREMENT,
     typ varchar(50),
-    model varchar(50),
-    product_number varchar(50),
-    wo_no varchar(50),
-    surface varchar(50),
-    cnt varchar(50),
-    start_time varchar(50),
-    end_time varchar(50),
-    ct_duration decimal,
-    theory_ts varchar(50) DEFAULT '',
-    actual_ts varchar(50) DEFAULT '',
-    movable_rate varchar(50) DEFAULT '',
-    stops varchar(50) default '',
-    stop_ts int(10) default 0,
-    fault_note varchar(50) default '',
-    change_ts varchar(50) default '',
-    gen_line varchar(20),
+    jizhong varchar(50),
+    pinfan varchar(50),
+    gongdanhao varchar(50),
+    mianfan varchar(50),
+    piliang varchar(50),
+    kaishi_shijian varchar(50),
+    jieshu_shijian varchar(50),
+    biaozhun_ct decimal,
+    lilun_shijian varchar(50) DEFAULT '',
+    shiji_shijian varchar(50) DEFAULT '',
+    kedong_lv varchar(50) DEFAULT '',
+    duanzanting_shijian varchar(50) default '',
+    duanzanting_huishu varchar(50) default '',
+    guzhangting_shijian varchar(50) default '',
+    guzhang_beizhu varchar(50) default '',
+    huanxian_shijian varchar(50) default '',
+    daoru_shijian varchar(50) default '',
+    shengchanxian varchar(20),
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
 """
@@ -50,10 +58,10 @@ def insert_acv(data, conn):
     cursor = conn.cursor()
     cursor.execute(acv_tab)
     conn.commit()
-    sql = "insert into acv_tab (typ,model,product_number,wo_no,surface,cnt,start_time,end_time,ct_duration,stops,stop_ts,gen_line) values "
+    sql = "insert into acv_tab (typ,jizhong,pinfan,gongdanhao,mianfan,piliang,kaishi_shijian,jieshu_shijian,biaozhun_ct,duanzanting_shijian,duanzanting_huishu,guzhangting_shijian,daoru_shijian,shengchanxian) values "
 
     for row in data:
-        sql = sql + "('{typ}','{model}','{product_number}','{wo_no}','{surface}','{cnt}','{start_time}','{end_time}',{ct_duration},'{stops}',{stop_ts},'{gen_line}'),".format(
+        sql = sql + "('{typ}','{jizhong}','{pinfan}','{gongdanhao}','{mianfan}','{piliang}','{kaishi_shijian}','{jieshu_shijian}',{biaozhun_ct},'{duanzanting_shijian}','{duanzanting_huishu}','{guzhangting_shijian}','{daoru_shijian}','{shengchanxian}'),".format(
             **row)
     sql = sql.strip(",") + ';'
 
@@ -63,25 +71,21 @@ def insert_acv(data, conn):
     cursor.close()
 
 
-"""    id INTEGER PRIMARY KEY  AUTOINCREMENT,
-    typ varchar(50),
-    model varchar(50),
-    product_number varchar(50),
-    wo_no varchar(50),
-    surface varchar(50),
-    cnt varchar(50),
-    start_time varchar(50),
-    end_time varchar(50),
-    ct_duration decimal,
-    theory_ts varchar(50) DEFAULT '',
-    actual_ts varchar(50) DEFAULT '',
-    movable_rate varchar(50) DEFAULT '',
-    stops varchar(50) default '',
-    stop_ts int(10) default 0,
-    fault_note varchar(50) default '',
-    change_ts varchar(50) default '',
-    gen_line varchar(20),
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP"""
+def insert_report(data, conn):
+    cursor = conn.cursor()
+    cursor.execute(acv_tab)
+    conn.commit()
+    sql = "insert into acv_tab (jizhong,pinfan,gongdanhao,mianfan,piliang,kaishi_shijian,jieshu_shijian,biaozhun_ct,lilun_shijian,shiji_shijian,kedong_lv,duanzanting_shijian,duanzanting_huishu,guzhangting_shijian,guzhang_beizhu,huanxian_shijian,daoru_shijian) values "
+
+    for row in data:
+        sql = sql + "('{jizhong}','{pinfan}','{gongdanhao}','{mianfan}','{piliang}','{kaishi_shijian}','{jieshu_shijian}',{biaozhun_ct},'{lilun_shijian}','{shiji_shijian}','{kedong_lv}','{duanzanting_shijian}','{duanzanting_huishu}','{guzhangting_shijian}','{guzhang_beizhu}','{huanxian_shijian}','{daoru_shijian}'),".format(
+            **row)
+    sql = sql.strip(",") + ';'
+
+    print(sql)
+    cursor.execute(sql)
+    conn.commit()
+    cursor.close()
 
 
 def get_acv(conn):
@@ -91,7 +95,7 @@ def get_acv(conn):
     conn.commit()
 
     result = cursor.execute(
-        "select id,typ,model,product_number,wo_no,surface,cnt,start_time,end_time,ct_duration,theory_ts,actual_ts,movable_rate,stops,stop_ts,fault_note,change_ts,gen_line from acv_tab;")
+        "select id,jizhong,pinfan,gongdanhao,mianfan,piliang,kaishi_shijian,jieshu_shijian,biaozhun_ct,lilun_shijian,shiji_shijian,kedong_lv,duanzanting_shijian,duanzanting_huishu,guzhangting_shijian,guzhang_beizhu,huanxian_shijian,daoru_shijian from acv_tab;")
     for row in result:
         data.append(list(row))
     cursor.close()
