@@ -55,7 +55,13 @@ def parse_acv_data(file_path, gen_line, conn):
 
     for i in range(0, length):
         row = data[i]
-        time_array = time.strptime(row[1], "%Y/%m/%d %H:%M:%S")
+
+        if len(row[1]) == 18:
+            time_array = time.strptime(row[1], "%Y/%m/%d %H:%M:%S")
+        elif len(row[1]) == 15:
+            time_array = time.strptime(row[1], "%Y/%m/%d %H:%M")
+        else:
+            continue
         other_style_time = int(time.mktime(time_array))
         cur_time = other_style_time
 
