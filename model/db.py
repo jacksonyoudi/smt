@@ -41,6 +41,7 @@ def parse_acv_data(file_path, gen_line, conn):
     length = len(data)
     stops = 0
     pre_time = None
+    start_time = data[0][1]
     end_time = data[-1][1]
     stop_ts = 0
     row = None
@@ -52,6 +53,28 @@ def parse_acv_data(file_path, gen_line, conn):
     ct_duration = 0
 
     guzhang_all_ts = 0
+
+    pingfan = data[0][0][10:19]
+    mianfan = data[0][0][-1]
+
+    ct_key = pingfan + mianfan
+    line_index = lines.get(gen_line) - 1
+
+    if mianfan == 'A':
+        ct_key = mianfan + 'F'
+    ct_item = ct_dict.get(ct_key)
+
+    ct_key = pingfan + mianfan
+    line_index = lines.get(gen_line) - 1
+
+    if mianfan == 'A':
+        ct_key = mianfan + 'F'
+    ct_item = ct_dict.get(ct_key)
+    ct_duration = 0
+    model_name = ''
+    if ct_item:
+        model_name = ct_item[1]
+        ct_duration = ct_item[line_index]
 
     for i in range(0, length):
         row = data[i]
@@ -105,17 +128,13 @@ def parse_acv_data(file_path, gen_line, conn):
                     "shengchanxian": gen_line
                 }
                 result.append(item)
-        ct_duration = biaozhun_ct
-        model_name = jizhong
         pre_time = other_style_time
-    # typ,model,product_number,wo_no,surface,cnt,start_time,end_time,ct_duration,stops,stop_ts
 
-    print(model_name)
     item = {
         "pinfan": row[0][10:19],
         "gongdanhao": row[0][22:30],
         "mianfan": row[0][-1],
-        "kaishi_shijian": row[1],
+        "kaishi_shijian": start_time,
         "jieshu_shijian": end_time,
         "piliang": str(length),
         "jizhong": model_name,
