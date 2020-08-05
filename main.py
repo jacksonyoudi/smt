@@ -3,6 +3,7 @@
 import PySimpleGUI as sg
 from model.db import insert_ct_data, parse_acv_data, parse_report_data
 from model.acv import get_acv, delete_acv_by_id
+from model.ct import get_ct_data
 import sqlite3
 import csv
 import datetime
@@ -29,7 +30,7 @@ lines = {
 }
 
 if __name__ == '__main__':
-    db_file = "./first.db"
+    db_file = "./smt.db"
     conn = sqlite3.connect(db_file)
 
     sg.theme('Dark Blue 3')  # please make your windows colorful
@@ -49,7 +50,9 @@ if __name__ == '__main__':
                                 enable_events=True)]
     three_line = [sg.Text("CT设置:", size=(10, 2)), sg.Input(key='ct_file', enable_events=True, visible=False),
                   sg.FileBrowse("导入CT设置表", target='ct_file', size=(20, 2), key="import_ct_xlsm", enable_events=True),
-                  sg.Button("导出CT设置表", size=(20, 2))]
+                  sg.Input(key='export_ct_path', enable_events=True, visible=False),
+                  sg.FolderBrowse("导出CT设置表", target='export_ct_path', size=(20, 2), key='export_ct',
+                                  enable_events=True)]
 
     # header = [[sg.Text('  ')] + [sg.Text(h, size=(14, 1)) for h in headings]]
     # input_rows = [[sg.Input(size=(15, 1), pad=(0, 0)) for col in range(4)] for row in range(10)]
@@ -61,10 +64,6 @@ if __name__ == '__main__':
         '故障停时间(分钟)',
         '故障备注', '换线时间', '导入时间']
 
-    # headings = ['id', 'jizhong', 'pinfan', 'gongdanhao', 'mianfan', 'piliang', 'kaishi_shijian', 'jieshu_shijian',
-    #             'biaozhun_ct', 'lilun_shijian', 'shiji_shijian', 'kedong_lv', 'duanzanting_shijian', 'duanzanting_huishu', 'guzhangting_shijian',
-    #             'guzhang_beizhu','huanxian_shijian','daoru_shijian',
-    #             'gen_line']
     data = get_acv(conn)
     if len(data) == 0:
         data = [headings]
@@ -104,27 +103,61 @@ if __name__ == '__main__':
         print(event, values)
         if event == 'acv_file':
             gen_line_key = values.get("gen_line")
-            import_acv_csv = values.get("import_acv_csv")
-            parse_acv_data(import_acv_csv, gen_line_key, conn)
-            sg.popup("导入成功")
-            data = get_acv(conn)
-            window.Element('_table_').Update(data)
-            sg.popup("页面已刷新")
+            if gen_line_key == '选择生产线':
+                sg.popup("必须选择生产线!!!")
+            else:
+                import_acv_csv = values.get("import_acv_csv")
+                if import_acv_csv:
+                    try:
+                        parse_acv_data(import_acv_csv, gen_line_key, conn)
+                    except Exception as e:
+                        sg.popup("导入失败,原因:", str(e))
+                        continue
+                    sg.popup("导入成功")
+                    try:
+                        data = get_acv(conn)
+                    except Exception as e:
+                        sg.popup("导入后获取数据失败:", str(e))
+                        continue
+                    try:
+                        window.Element('_table_').Update(data)
+                    except Exception as e:
+                        sg.popup("更新表格数据失败:", str(e))
+                        continue
+                    sg.popup("页面已刷新")
 
         if event == 'delete_table_row':
-            # if event == '_table_':
+            if not values.get("_table_"):
+                sg.popup("请点选表格对应行的数据")
+                continue
             select_index = values.get("_table_")[0]
             row = window.Element('_table_').Values[select_index]
             data = window.Element('_table_').Values
-            delete_acv_by_id(conn, row[0])
+
+            try:
+                delete_acv_by_id(conn, row[0])
+            except Exception as e:
+                sg.popup("删除失败! ", str(e))
+                continue
             sg.popup("删除成功")
-            result = get_acv(conn)
-            window.Element('_table_').Update(result)
+
+            try:
+                result = get_acv(conn)
+                window.Element('_table_').Update(result)
+            except Exception as e:
+                sg.popup("重新刷新数据失败! ", str(e))
+                continue
             sg.popup("页面已刷新")
 
         if event == 'ct_file':
             ct_file = values.get('ct_file')
-            insert_ct_data(conn, ct_file)
+            if not ct_file:
+                sg.popup("文件不合法，请重新选择导入")
+                continue
+            try:
+                insert_ct_data(conn, ct_file)
+            except Exception as e:
+                sg.popup("导入失败!", str(e))
             sg.popup("导入成功")
 
         if event == 'report_file':
@@ -133,17 +166,61 @@ if __name__ == '__main__':
         if event == 'export_table':
             pass
 
+        if event == 'export_ct_path':
+            export_report_path = values.get("export_ct_path")
+            if export_report_path:
+                try:
+                    file_path = os.path.join(export_report_path,
+                                             "ct_tab_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d")))
+                    result = get_ct_data(conn)
+                    headers = ["产线机种名",
+                               "半成品品番",
+                               "面",
+                               "机种",
+                               'EPS 1#',
+                               'EPS 2#',
+                               'EPS 3#',
+                               'EPS 4#',
+                               'EPS 5#',
+                               'EPS 6#',
+                               'ECU 7#',
+                               'ECU 8#',
+                               'ECU 9#',
+                               'ECU 10#',
+                               'ECU 11#',
+                               'ECU 12#',
+                               'ECU 13#',
+                               'ECU 14#',
+                               'ECU 15#',
+                               'ECU 16#']
+
+                    with open(file_path, 'w') as f:
+                        f_csv = csv.writer(f)
+                        f_csv.writerow(headers)
+                        for row in result:
+                            f_csv.writerow(row)
+                except Exception as e:
+                    sg.popup("导出失败!", str(e))
+                    continue
+                sg.popup("导出成功!")
+            else:
+                sg.popup("请选择一个合法的目录!")
+
         if event == 'export_report_path':
             export_report_path = values.get("export_report_path")
             if export_report_path:
-                file_path = os.path.join(export_report_path,
-                                         "export_tab_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d")))
-                result = get_acv(conn)
-                with open(file_path, 'w') as f:
-                    f_csv = csv.writer(f)
-                    f_csv.writerow(headings[1:])
-                    for row in result:
-                        f_csv.writerow(row[1:])
+                try:
+                    file_path = os.path.join(export_report_path,
+                                             "export_tab_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d")))
+                    result = get_acv(conn)
+                    with open(file_path, 'w') as f:
+                        f_csv = csv.writer(f)
+                        f_csv.writerow(headings[1:])
+                        for row in result:
+                            f_csv.writerow(row[1:])
+                except Exception as e:
+                    sg.popup("导出失败!", str(e))
+                    continue
                 sg.popup("导出成功!")
             else:
                 sg.popup("请选择一个合法的目录!")
@@ -151,10 +228,24 @@ if __name__ == '__main__':
         if event == 'import_report_file':
             import_report_file = values.get('import_report_file')
             if import_report_file:
-                parse_report_data(import_report_file, conn)
+
+                try:
+                    parse_report_data(import_report_file, conn)
+                except Exception as e:
+                    sg.popup("导入失败,原因:", str(e))
+                    continue
                 sg.popup("导入成功")
-                result = get_acv(conn)
-                window.Element('_table_').Update(result)
+
+                try:
+                    data = get_acv(conn)
+                except Exception as e:
+                    sg.popup("导入后获取数据失败:", str(e))
+                    continue
+                try:
+                    window.Element('_table_').Update(data)
+                except Exception as e:
+                    sg.popup("更新表格数据失败:", str(e))
+                    continue
                 sg.popup("页面已刷新")
             else:
                 sg.popup("请选择一个合法的文件!")

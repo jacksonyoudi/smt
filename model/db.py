@@ -1,12 +1,32 @@
 # -*- coding: utf-8 -*-
 
 from controller.lib.csv_handle import parse_csv
-from model.ct import insert_ct
+from model.ct import insert_ct, get_ct
 from model.acv import insert_acv, insert_report
 import time
 import datetime
 from pytz import timezone
 from controller.lib.pd_excel_handle import parse_excel_by_pd
+
+lines = {
+    "EPS 1#": 6,
+    "EPS 2#": 7,
+    "EPS 3#": 8,
+    "EPS 4#": 9,
+    "EPS 5#": 10,
+    "EPS 6#": 11,
+    "ECU 7#": 12,
+    "ECU 8#": 13,
+    "ECU 9#": 14,
+    "ECU 10#": 15,
+    "ECU 11#": 16,
+    "ECU 12#": 17,
+    "ECU 13#": 18,
+    "ECU 14#": 19,
+    "ECU 15#": 20,
+    "ECU 16#": 21
+
+}
 
 
 def insert_ct_data(conn, file_path):
@@ -21,44 +41,68 @@ def parse_acv_data(file_path, gen_line, conn):
     length = len(data)
     stops = 0
     pre_time = None
-    start_time = data[0][1]
     end_time = data[-1][1]
     stop_ts = 0
     row = None
     cst_tz = timezone('Asia/Shanghai')
     insert_time = datetime.datetime.now().replace(tzinfo=cst_tz).strftime("%Y-%m-%d %H:%M:%S")
 
+    ct_dict = get_ct(conn)
+    model_name = ''
+    ct_duration = 0
+
+    guzhang_all_ts = 0
+
     for i in range(0, length):
         row = data[i]
         time_array = time.strptime(row[1], "%Y/%m/%d %H:%M:%S")
         other_style_time = int(time.mktime(time_array))
         cur_time = other_style_time
+
+        pingfan = row[0][10:19]
+        mianfan = row[0][-1]
+
+        ct_key = pingfan + mianfan
+        line_index = lines.get(gen_line) - 1
+
+        if mianfan == 'A':
+            ct_key = mianfan + 'F'
+        ct_item = ct_dict.get(ct_key)
+
+        jizhong = ''
+        biaozhun_ct = 0
+        if ct_item:
+            jizhong = ct_item[1]
+            biaozhun_ct = ct_item[line_index]
+        guzhang_shijian = 0
         if pre_time:
             if (cur_time - pre_time) <= 60 * 5 and (cur_time - pre_time) > 0:
                 stops += 1
                 stop_ts += (cur_time - pre_time)
+            elif (cur_time - pre_time) > 5 * 60:
+                guzhang_shijian = (cur_time - pre_time) - biaozhun_ct
+                guzhang_all_ts += guzhang_shijian
         pre_time = other_style_time
-        # typ,jizhong,pinfan,gongdanhao,mianfan,piliang,kaishi_shijian,jieshu_shijian,biaozhun_ct," \
-        #           "duanzanting_shijian,duanzanting_huishu,guzhangting_shijian,daoru_shijian,shengchanxian
 
         item = {
             "typ": "detail",
-            "pinfan": row[0][10:19],
+            "pinfan": pingfan,
             "gongdanhao": row[0][22:30],
-            "mianfan": row[0][-1],
+            "mianfan": mianfan,
             "kaishi_shijian": row[1],
             "jieshu_shijian": end_time,
             "piliang": '',
-            "jizhong": '',
-            "biaozhun_ct": 0,
+            "jizhong": jizhong,
+            "biaozhun_ct": biaozhun_ct,
             "duanzanting_shijian": '',
             "duanzanting_huishu": '',
-            "guzhangting_shijian": '',
+            "guzhangting_shijian": "{min}:{sec}".format(min=guzhang_shijian // 60, sec=guzhang_shijian % 60),
             "daoru_shijian": insert_time,
             "shengchanxian": gen_line
         }
         result.append(item)
-
+        model_name = jizhong
+        ct_duration = biaozhun_ct
     # typ,model,product_number,wo_no,surface,cnt,start_time,end_time,ct_duration,stops,stop_ts
 
     item = {
@@ -68,11 +112,11 @@ def parse_acv_data(file_path, gen_line, conn):
         "kaishi_shijian": row[1],
         "jieshu_shijian": end_time,
         "piliang": str(length),
-        "jizhong": '',
-        "biaozhun_ct": 0,
-        "duanzanting_shijian": '',
-        "duanzanting_huishu": '',
-        "guzhangting_shijian": '',
+        "jizhong": model_name,
+        "biaozhun_ct": ct_duration,
+        "duanzanting_shijian": "{min}:{sec}".format(min=stop_ts // 60, sec=stop_ts % 60),
+        "duanzanting_huishu": str(stops),
+        "guzhangting_shijian": "{min}:{sec}".format(min=guzhang_all_ts // 60, sec=guzhang_all_ts % 60),
         "daoru_shijian": insert_time,
         "shengchanxian": gen_line,
         "typ": "agg"

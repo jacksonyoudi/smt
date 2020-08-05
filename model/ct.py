@@ -50,11 +50,29 @@ def get_ct(conn):
     cursor = conn.cursor()
     data = {}
 
+    cursor.execute(ct_tab)
+    conn.commit()
+
     result = cursor.execute(
         "select id,model_name, product_number, surface, model,eps_1, eps_2,eps_3,eps_4,eps_5,eps_6,eps_7,eps_8,eps_9,eps_10,eps_11,eps_12,eps_13,eps_14,eps_15,eps_16 from ct_tab;")
     for row in result:
-        key = row[1] + row[2] + row[3]
+        key = row[2] + row[3]
         data[key] = row
+    cursor.close()
+    return data
+
+
+def get_ct_data(conn):
+    cursor = conn.cursor()
+    data = []
+
+    cursor.execute(ct_tab)
+    conn.commit()
+
+    result = cursor.execute(
+        "select model_name, product_number, surface, model,eps_1, eps_2,eps_3,eps_4,eps_5,eps_6,eps_7,eps_8,eps_9,eps_10,eps_11,eps_12,eps_13,eps_14,eps_15,eps_16 from ct_tab;")
+    for row in result:
+        data.append(list(row))
     cursor.close()
     return data
 
