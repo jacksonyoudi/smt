@@ -105,11 +105,12 @@ def parse_acv_data(file_path, gen_line, conn):
                     "shengchanxian": gen_line
                 }
                 result.append(item)
-                model_name = jizhong
-                ct_duration = biaozhun_ct
+        ct_duration = biaozhun_ct
+        model_name = jizhong
         pre_time = other_style_time
     # typ,model,product_number,wo_no,surface,cnt,start_time,end_time,ct_duration,stops,stop_ts
 
+    print(model_name)
     item = {
         "pinfan": row[0][10:19],
         "gongdanhao": row[0][22:30],

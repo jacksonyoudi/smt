@@ -83,8 +83,9 @@ if __name__ == '__main__':
                         col_widths=[1000 for i in headings],
                         font='Courier 14',
                         key='_table_',
-                        text_color='red',
-                        alternating_row_color='green',
+                        text_color='black',
+                        alternating_row_color='gray',
+                        background_color='white',
                         max_col_width=8000
                         )]
               ]
