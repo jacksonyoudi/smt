@@ -124,6 +124,12 @@ if __name__ == '__main__':
                     except Exception as e:
                         sg.popup("更新表格数据失败:", str(e))
                         continue
+
+                    try:
+                        os.remove(import_acv_csv)
+                    except Exception as e:
+                        sg.popup("文件删除失败:", str(e))
+                        continue
                     sg.popup("页面已刷新")
 
         if event == 'delete_table_row':

@@ -80,7 +80,6 @@ def parse_acv_data(file_path, gen_line, conn):
         if ct_item:
             jizhong = ct_item[1]
             biaozhun_ct = ct_item[line_index]
-        guzhang_shijian = 0
         if pre_time:
             if (cur_time - pre_time) <= 60 * 5 and (cur_time - pre_time) > 0:
                 stops += 1
@@ -88,27 +87,27 @@ def parse_acv_data(file_path, gen_line, conn):
             elif (cur_time - pre_time) > 5 * 60:
                 guzhang_shijian = (cur_time - pre_time) - biaozhun_ct
                 guzhang_all_ts += guzhang_shijian
-        pre_time = other_style_time
 
-        item = {
-            "typ": "detail",
-            "pinfan": pingfan,
-            "gongdanhao": row[0][22:30],
-            "mianfan": mianfan,
-            "kaishi_shijian": row[1],
-            "jieshu_shijian": end_time,
-            "piliang": '',
-            "jizhong": jizhong,
-            "biaozhun_ct": biaozhun_ct,
-            "duanzanting_shijian": '',
-            "duanzanting_huishu": '',
-            "guzhangting_shijian": "{min}:{sec}".format(min=guzhang_shijian // 60, sec=guzhang_shijian % 60),
-            "daoru_shijian": insert_time,
-            "shengchanxian": gen_line
-        }
-        result.append(item)
-        model_name = jizhong
-        ct_duration = biaozhun_ct
+                item = {
+                    "typ": "detail",
+                    "pinfan": pingfan,
+                    "gongdanhao": row[0][22:30],
+                    "mianfan": mianfan,
+                    "kaishi_shijian": row[1],
+                    "jieshu_shijian": end_time,
+                    "piliang": '',
+                    "jizhong": jizhong,
+                    "biaozhun_ct": biaozhun_ct,
+                    "duanzanting_shijian": '',
+                    "duanzanting_huishu": '',
+                    "guzhangting_shijian": "{min}:{sec}".format(min=guzhang_shijian // 60, sec=guzhang_shijian % 60),
+                    "daoru_shijian": insert_time,
+                    "shengchanxian": gen_line
+                }
+                result.append(item)
+                model_name = jizhong
+                ct_duration = biaozhun_ct
+        pre_time = other_style_time
     # typ,model,product_number,wo_no,surface,cnt,start_time,end_time,ct_duration,stops,stop_ts
 
     item = {
