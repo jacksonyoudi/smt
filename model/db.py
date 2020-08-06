@@ -115,7 +115,7 @@ def parse_acv_data(file_path, gen_line, conn):
                     "biaozhun_ct": biaozhun_ct,
                     "duanzanting_shijian": '',
                     "duanzanting_huishu": '',
-                    "guzhangting_shijian": "{min}:{sec}".format(min=int(guzhang_shijian // 60),
+                    "guzhangting_shijian": "00:{min}:{sec}".format(min=int(guzhang_shijian // 60),
                                                                 sec=int(guzhang_shijian % 60)),
                     "daoru_shijian": insert_time,
                     "shengchanxian": gen_line
@@ -133,9 +133,9 @@ def parse_acv_data(file_path, gen_line, conn):
         "piliang": str(length),
         "jizhong": model_name,
         "biaozhun_ct": ct_duration,
-        "duanzanting_shijian": "{min}:{sec}".format(min=int(stop_ts // 60), sec=int(stop_ts % 60)),
+        "duanzanting_shijian": "00:{min}:{sec}".format(min=int(stop_ts // 60), sec=int(stop_ts % 60)),
         "duanzanting_huishu": str(stops),
-        "guzhangting_shijian": "{min}:{sec}".format(min=int(guzhang_all_ts // 60), sec=int(guzhang_all_ts % 60)),
+        "guzhangting_shijian": "00:{min}:{sec}".format(min=int(guzhang_all_ts // 60), sec=int(guzhang_all_ts % 60)),
         "daoru_shijian": insert_time,
         "shengchanxian": gen_line,
         "typ": "agg"
