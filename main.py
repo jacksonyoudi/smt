@@ -200,8 +200,8 @@ if __name__ == '__main__':
                                'ECU 15#',
                                'ECU 16#']
 
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f_csv = csv.writer(f, dialect='exce')
+                    with open(file_path, 'w', encoding='utf-8', newline='') as f:
+                        f_csv = csv.writer(f)
                         f_csv.writerow(headers)
                         for row in result:
                             f_csv.writerow(row)
@@ -219,8 +219,8 @@ if __name__ == '__main__':
                     file_path = os.path.join(export_report_path,
                                              "export_tab_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d")))
                     result = get_acv(conn)
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f_csv = csv.writer(f, dialect='exce')
+                    with open(file_path, 'w', encoding='utf-8', newline='') as f:
+                        f_csv = csv.writer(f)
                         f_csv.writerow(headings[1:])
                         for row in result:
                             f_csv.writerow(row[1:])
