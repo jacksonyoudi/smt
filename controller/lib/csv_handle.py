@@ -23,14 +23,14 @@ def table(data):
         con.close()
 
 
-def parse_csv(csv_file):
+def parse_csv(csv_file, encoding=None):
     """
     读取数据返回列表的数据
     :param csv_file:
     :return:
     """
     data = []
-    with open(csv_file) as f:
+    with open(csv_file, encoding=encoding) as f:
         f_csv = csv.reader(f)
         # 去除头部数据
         header = next(f_csv)
