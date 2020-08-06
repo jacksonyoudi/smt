@@ -49,8 +49,6 @@ def parse_acv_data(file_path, gen_line, conn):
     insert_time = datetime.datetime.now().replace(tzinfo=cst_tz).strftime("%Y-%m-%d %H:%M:%S")
 
     ct_dict = get_ct(conn)
-    model_name = ''
-    ct_duration = 0
 
     guzhang_all_ts = 0
 
@@ -61,14 +59,7 @@ def parse_acv_data(file_path, gen_line, conn):
     line_index = lines.get(gen_line) - 1
 
     if mianfan == 'A':
-        ct_key = mianfan + 'F'
-    ct_item = ct_dict.get(ct_key)
-
-    ct_key = pingfan + mianfan
-    line_index = lines.get(gen_line) - 1
-
-    if mianfan == 'A':
-        ct_key = mianfan + 'F'
+        ct_key = pingfan + 'F'
     ct_item = ct_dict.get(ct_key)
     ct_duration = 0
     model_name = ''
@@ -95,7 +86,7 @@ def parse_acv_data(file_path, gen_line, conn):
         line_index = lines.get(gen_line) - 1
 
         if mianfan == 'A':
-            ct_key = mianfan + 'F'
+            ct_key = pingfan + 'F'
         ct_item = ct_dict.get(ct_key)
 
         jizhong = ''
