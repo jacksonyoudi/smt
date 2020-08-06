@@ -41,6 +41,7 @@ def parse_acv_data(file_path, gen_line, conn):
     length = len(data)
     stops = 0
     pre_time = None
+    pre_time_str = ''
     start_time = data[0][1]
     end_time = data[-1][1]
     stop_ts = 0
@@ -97,7 +98,7 @@ def parse_acv_data(file_path, gen_line, conn):
         if pre_time:
             if (cur_time - pre_time) <= 60 * 5 and (cur_time - pre_time) > 0:
                 stops += 1
-                stop_ts += (cur_time - pre_time)
+                stop_ts += (cur_time - pre_time - ct_duration)
             elif (cur_time - pre_time) > 5 * 60:
                 guzhang_shijian = (cur_time - pre_time) - biaozhun_ct
                 guzhang_all_ts += guzhang_shijian
@@ -105,34 +106,36 @@ def parse_acv_data(file_path, gen_line, conn):
                 item = {
                     "typ": "detail",
                     "pinfan": pingfan,
-                    "gongdanhao": row[0][22:30],
+                    "gongdanhao": row[0][22:29],
                     "mianfan": mianfan,
-                    "kaishi_shijian": row[1],
-                    "jieshu_shijian": end_time,
+                    "kaishi_shijian": pre_time_str,
+                    "jieshu_shijian": row[1],
                     "piliang": '',
                     "jizhong": jizhong,
                     "biaozhun_ct": biaozhun_ct,
                     "duanzanting_shijian": '',
                     "duanzanting_huishu": '',
-                    "guzhangting_shijian": "{min}:{sec}".format(min=guzhang_shijian // 60, sec=guzhang_shijian % 60),
+                    "guzhangting_shijian": "{min}:{sec}".format(min=int(guzhang_shijian // 60),
+                                                                sec=int(guzhang_shijian % 60)),
                     "daoru_shijian": insert_time,
                     "shengchanxian": gen_line
                 }
                 result.append(item)
         pre_time = other_style_time
+        pre_time_str = row[1]
 
     item = {
         "pinfan": row[0][10:19],
-        "gongdanhao": row[0][22:30],
+        "gongdanhao": row[0][22:29],
         "mianfan": row[0][-1],
         "kaishi_shijian": start_time,
         "jieshu_shijian": end_time,
         "piliang": str(length),
         "jizhong": model_name,
         "biaozhun_ct": ct_duration,
-        "duanzanting_shijian": "{min}:{sec}".format(min=stop_ts // 60, sec=stop_ts % 60),
+        "duanzanting_shijian": "{min}:{sec}".format(min=int(stop_ts // 60), sec=int(stop_ts % 60)),
         "duanzanting_huishu": str(stops),
-        "guzhangting_shijian": "{min}:{sec}".format(min=guzhang_all_ts // 60, sec=guzhang_all_ts % 60),
+        "guzhangting_shijian": "{min}:{sec}".format(min=int(guzhang_all_ts // 60), sec=int(guzhang_all_ts % 60)),
         "daoru_shijian": insert_time,
         "shengchanxian": gen_line,
         "typ": "agg"

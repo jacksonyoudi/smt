@@ -130,7 +130,7 @@ if __name__ == '__main__':
                     # except Exception as e:
                     #     sg.popup("文件删除失败:", str(e))
                     #     continue
-                    sg.popup("页面已刷新")
+                    # sg.popup("页面已刷新")
 
         if event == 'delete_table_row':
             if not values.get("_table_"):
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             except Exception as e:
                 sg.popup("重新刷新数据失败! ", str(e))
                 continue
-            sg.popup("页面已刷新")
+            # sg.popup("页面已刷新")
 
         if event == 'ct_file':
             ct_file = values.get('ct_file')
@@ -200,7 +200,7 @@ if __name__ == '__main__':
                                'ECU 15#',
                                'ECU 16#']
 
-                    with open(file_path, 'w') as f:
+                    with open(file_path, 'w', encoding='utf-8') as f:
                         f_csv = csv.writer(f)
                         f_csv.writerow(headers)
                         for row in result:
@@ -219,7 +219,7 @@ if __name__ == '__main__':
                     file_path = os.path.join(export_report_path,
                                              "export_tab_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d")))
                     result = get_acv(conn)
-                    with open(file_path, 'w') as f:
+                    with open(file_path, 'w', encoding='utf-8') as f:
                         f_csv = csv.writer(f)
                         f_csv.writerow(headings[1:])
                         for row in result:
@@ -234,7 +234,6 @@ if __name__ == '__main__':
         if event == 'import_report_file':
             import_report_file = values.get('import_report_file')
             if import_report_file:
-
                 try:
                     parse_report_data(import_report_file, conn)
                 except Exception as e:
@@ -252,7 +251,7 @@ if __name__ == '__main__':
                 except Exception as e:
                     sg.popup("更新表格数据失败:", str(e))
                     continue
-                sg.popup("页面已刷新")
+                # sg.popup("页面已刷新")
             else:
                 sg.popup("请选择一个合法的文件!")
 
