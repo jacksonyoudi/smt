@@ -78,13 +78,11 @@ if __name__ == '__main__':
                         headings=headings,
                         enable_events=True,
                         justification='center',
-                        display_row_numbers=True,
                         num_rows=1000,
                         col_widths=[1000 for i in headings],
                         font='Courier 14',
                         key='_table_',
                         text_color='black',
-                        alternating_row_color='gray',
                         background_color='white',
                         max_col_width=8000
                         )]
