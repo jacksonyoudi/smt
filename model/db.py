@@ -147,7 +147,7 @@ def parse_acv_data(file_path, gen_line, conn):
 
 
 def parse_report_data(file_path, conn):
-    header, data = parse_csv(file_path)
+    header, data = parse_csv(file_path, 'utf-8')
     result = []
     for row in data:
         item = {
