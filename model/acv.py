@@ -73,6 +73,10 @@ def insert_acv(data, conn):
 
 def insert_report(data, conn):
     cursor = conn.cursor()
+
+    cursor.execute("drop table if exists acv_tab;")
+    conn.commit()
+
     cursor.execute(acv_tab)
     conn.commit()
     sql = "insert into acv_tab (jizhong,pinfan,gongdanhao,mianfan,piliang,kaishi_shijian,jieshu_shijian,biaozhun_ct,lilun_shijian,shiji_shijian,kedong_lv,duanzanting_shijian,duanzanting_huishu,guzhangting_shijian,guzhang_beizhu,huanxian_shijian,daoru_shijian) values "

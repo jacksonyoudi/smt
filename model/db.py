@@ -96,10 +96,10 @@ def parse_acv_data(file_path, gen_line, conn):
             jizhong = ct_item[1]
             biaozhun_ct = ct_item[line_index]
         if pre_time:
-            if (cur_time - pre_time) <= 60 * 5 and (cur_time - pre_time) > 0:
+            if (cur_time - pre_time - ct_duration) <= 60 * 5 and (cur_time - pre_time - ct_duration) > 0:
                 stops += 1
                 stop_ts += (cur_time - pre_time - ct_duration)
-            elif (cur_time - pre_time) > 5 * 60:
+            elif (cur_time - pre_time-biaozhun_ct) > 5 * 60:
                 guzhang_shijian = (cur_time - pre_time) - biaozhun_ct
                 guzhang_all_ts += guzhang_shijian
 
