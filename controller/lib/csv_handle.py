@@ -91,8 +91,8 @@ if __name__ == '__main__':
 
     result.insert(0, item)
 
-    print(result[0])
+    # print(result[0])
 
-    print(stops)
+    # print(stops)
     # one = data[0]
     # table(one)

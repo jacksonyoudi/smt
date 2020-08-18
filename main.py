@@ -100,7 +100,7 @@ if __name__ == '__main__':
     while True:
         event, values = window.read()
 
-        print(event, values)
+        # print(event, values)
         if event == 'acv_file':
             gen_line_key = values.get("gen_line")
             if gen_line_key == '选择生产线':
@@ -200,7 +200,7 @@ if __name__ == '__main__':
                                'ECU 15#',
                                'ECU 16#']
 
-                    with open(file_path, 'w', encoding='utf-8') as f:
+                    with open(file_path, 'w') as f:
                         f_csv = csv.writer(f)
                         f_csv.writerow(headers)
                         for row in result:
@@ -219,7 +219,7 @@ if __name__ == '__main__':
                     file_path = os.path.join(export_report_path,
                                              "export_tab_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d")))
                     result = get_acv(conn)
-                    with open(file_path, 'w', encoding='utf-8') as f:
+                    with open(file_path, 'w') as f:
                         f_csv = csv.writer(f)
                         f_csv.writerow(headings[1:])
                         for row in result:
