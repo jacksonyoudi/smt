@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import PySimpleGUI as sg
+import unicodecsv as ucsv
 from model.db import insert_ct_data, parse_acv_data, parse_report_data
 from model.acv import get_acv, delete_acv_by_id
 from model.ct import get_ct_data
@@ -201,7 +202,7 @@ if __name__ == '__main__':
                                'ECU 16#']
 
                     with open(file_path, 'w') as f:
-                        f_csv = csv.writer(f)
+                        f_csv = ucsv.writer(f, encoding='gbk')
                         f_csv.writerow(headers)
                         for row in result:
                             f_csv.writerow(row)
@@ -220,7 +221,7 @@ if __name__ == '__main__':
                                              "export_tab_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d")))
                     result = get_acv(conn)
                     with open(file_path, 'w') as f:
-                        f_csv = csv.writer(f)
+                        f_csv = ucsv.writer(f, encoding='gbk')
                         f_csv.writerow(headings[1:])
                         for row in result:
                             f_csv.writerow(row[1:])
