@@ -56,7 +56,6 @@ if __name__ == '__main__':
 
     # header = [[sg.Text('  ')] + [sg.Text(h, size=(14, 1)) for h in headings]]
     # input_rows = [[sg.Input(size=(15, 1), pad=(0, 0)) for col in range(4)] for row in range(10)]
-
     headings = [
         'id', '   机种    ', '      品番     ', '    工单号    ', '    面番   ', '     批量    ',
         '    开始时间    ', '   结束时间    ', '    标准CT(秒)     ', '       理论时间    ',
