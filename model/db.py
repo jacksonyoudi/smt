@@ -59,6 +59,7 @@ def parse_acv_data(file_path, gen_line, conn):
     ct_key = pingfan + mianfan
     line_index = lines.get(gen_line) - 1
 
+    print("length", length)
     if mianfan == 'A':
         ct_key = pingfan + 'F'
     ct_item = ct_dict.get(ct_key)
@@ -70,8 +71,7 @@ def parse_acv_data(file_path, gen_line, conn):
 
     for i in range(0, length):
         row = data[i]
-
-        if len(row[1]) == 18:
+        if len(row[1]) in (18, 19):
             time_array = time.strptime(row[1], "%Y/%m/%d %H:%M:%S")
         elif len(row[1]) == 15:
             time_array = time.strptime(row[1], "%Y/%m/%d %H:%M")
@@ -95,11 +95,12 @@ def parse_acv_data(file_path, gen_line, conn):
         if ct_item:
             jizhong = ct_item[1]
             biaozhun_ct = ct_item[line_index]
+
         if pre_time:
             if (cur_time - pre_time - ct_duration) <= 60 * 5 and (cur_time - pre_time - ct_duration) > 0:
                 stops += 1
                 stop_ts += (cur_time - pre_time - ct_duration)
-            elif (cur_time - pre_time-biaozhun_ct) > 5 * 60:
+            elif (cur_time - pre_time - biaozhun_ct) > 5 * 60:
                 guzhang_shijian = (cur_time - pre_time) - biaozhun_ct
                 guzhang_all_ts += guzhang_shijian
 
@@ -116,7 +117,7 @@ def parse_acv_data(file_path, gen_line, conn):
                     "duanzanting_shijian": '',
                     "duanzanting_huishu": '',
                     "guzhangting_shijian": "00:{min}:{sec}".format(min=int(guzhang_shijian // 60),
-                                                                sec=int(guzhang_shijian % 60)),
+                                                                   sec=int(guzhang_shijian % 60)),
                     "daoru_shijian": insert_time,
                     "shengchanxian": gen_line
                 }
